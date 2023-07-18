@@ -29,7 +29,7 @@ install_docker () {
     pct exec $1 -- bash -c "apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin"
 }
 TEMPLATE_PATH="local:vztmpl/debian-11-standard_11.3-1_amd64.tar.zst"
-NETWORK="name=eth0,bridge=vmbr2,ip=dhcp"
+NETWORK="name=eth0,bridge=vmbr1,ip=dhcp"
 CTID=`pvesh get /cluster/nextid`
 MEMORY_SIZE=4096
 SWAP_SIZE=4096
