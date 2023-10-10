@@ -34,11 +34,23 @@ CTID=`pvesh get /cluster/nextid`
 MEMORY_SIZE=4096
 SWAP_SIZE=4096
 DISK="volume=local-zfs:40"
-CPU_COUNT=2
+CPU_COUNT=4
 CMD="pct create ${CTID} ${TEMPLATE_PATH} -net0 ${NETWORK} -onboot 1 -hostname ${HOSTNAME} --password ${PASSWORD} -cores ${CPU_COUNT} -memory=${MEMORY_SIZE} -swap=${SWAP_SIZE} -rootfs ${DISK} --features nesting=1"
 echo "Running '${CMD}'..."
 $CMD
 pct start $CTID
+while :
+do
+    CTIP=$(pct exec $CTID -- bash -c "ip route | awk '/default via/ {print \$5}' | xargs -I {} ip addr show dev {} | awk '/inet / {print \$2}' | cut -d '/' -f 1")
+  
+    if [ ${#CTIP} -ge 8 ]
+    then
+        printf "\nsuccess: The container obtained the IP ${CTIP}.\n\n" >&2
+        break;
+    fi
+
+    printf "\nerror: Waiting for the container to obtain it's IP address.\n\n" >&2
+done
 pct exec $CTID -- bash -c 'sed -in "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config'
 pct exec $CTID -- bash -c 'service sshd restart'
 pct exec $CTID -- bash -c "apt-get update && apt-get dist-upgrade -y"
