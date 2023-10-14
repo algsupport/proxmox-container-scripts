@@ -71,8 +71,8 @@ create_container () {
   CMD="pct create ${CTID} ${TEMPLATE_PATH} -net0 ${NETWORK} -onboot 1 -hostname ${hostname} --password ${password} -cores ${CPU_COUNT} -memory=${MEMORY_SIZE} -swap=${SWAP_SIZE} -rootfs ${DISK} --features nesting=1"
   $CMD
   pct start $CTID
-  sleep 10
   echo "Info: Waiting for the container to obtain it's IP address."
+  sleep 10
   while :
   do
     CTIP=$(pct exec $CTID -- bash -c "ip route | awk '/default via/ {print \$5}' | xargs -I {} ip addr show dev {} | awk '/inet / {print \$2}' | cut -d '/' -f 1" 2>/dev/null)
